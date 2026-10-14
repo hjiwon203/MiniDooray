@@ -1,185 +1,205 @@
 # Mini Dooray
-> Spring Boot 기반의 협업 프로젝트 관리 서비스
+> Spring Boot 기반의 협업 프로젝트 관리 서비스 (4인 팀 · MSA 구조)
+
 ---
+
 ## 🧑‍💻 프로젝트 소개
 #### 개발 기간 : 2026.05.14 - 2026.05.22 (9일)
-- 본 프로젝트는 프로젝트, 업무(Task), 댓글, 태그, 마일스톤 기능을 제공하는 협업 플랫폼입니다.
-- Spring Boot 기반으로 개발되었으며, Spring Security와 Redis Session 기반 인증 구조 및 API 분리 아키텍처를 적용한 **4인 팀 프로젝트**입니다.
-
-### 주요 기능
-- 프로젝트 생성 / 수정 / 삭제
-- Task CRUD 및 상태 관리
-- 댓글 기반 협업 기능
-- 태그 및 마일스톤 관리
-- 로그인 / 로그아웃 (Spring Security + Redis Session)
-- Gateway 기반 API 라우팅
-
-### 핵심 목표 
-- 프론트/백엔드 역할 분리 구조 이해
-- Gateway 기반 MSA 스타일 API 라우팅 경험
-- Redis 기반 Session Clustering을 통한 인증 확장성 확보
-- Validation 및 예외 처리 표준화
-- API 기반 서비스 통신 구조 설계 경험
+- 프로젝트, 업무(Task), 댓글, 태그, 마일스톤 기능을 제공하는 협업 플랫폼입니다.
+- Front / Gateway / Account API / Task API 4개 서버로 나눈 **4인 팀 프로젝트**이며, 저는 **Task API를 팀원 1명과 함께 담당**했습니다.
 
 ### Architecture
 ```text
 Client
    │
    ▼
-Front Server
+Front Server (Thymeleaf, Redis Session)
    │
    ▼
-Gateway Server 
+Gateway Server
    │
-   ├── Account API
-   └── Task API
+   ├── Account API   (회원)
+   └── Task API      (프로젝트 · 업무 · 댓글 · 태그 · 마일스톤)  ◀ 담당
 ```
 
+### 주요 기능
+- 프로젝트 생성 / 수정 / 삭제, 멤버 초대
+- 업무(Task) CRUD 및 상태 관리 (TODO · IN_PROGRESS · DONE)
+- 댓글 기반 협업
+- 태그 및 마일스톤 관리
+- 로그인 / 로그아웃 (Spring Security + Redis Session)
+- Gateway 기반 API 라우팅
+
 ### Service Description
-#### Front 
-- 사용자 요청 처리
-- Thymeleaf 기반 화면 렌더링
-- 인증 처리 및 세션 유지
-- Gateway API 호출 및 데이터 조합
-#### Gateway
-- 요청 라우팅
-- Account / Task API 분리 연결
-#### Account API
-- 회원 관리
-#### Task API
-- 프로젝트 관리
-- Task, Comment, Tag, Milestone 기능 제공
+| 서버 | 역할 |
+|--|--|
+| Front | 사용자 요청 처리, Thymeleaf 화면 렌더링, 인증 및 Redis 세션 유지, Gateway API 호출 및 데이터 조합 |
+| Gateway | 요청 라우팅, Account / Task API 분리 연결 |
+| Account API | 회원 가입 · 정보 · 상태 관리 |
+| **Task API** | 프로젝트 · 멤버 · 업무 · 댓글 · 태그 · 마일스톤 관리 **(담당)** |
+
+Gateway에서 인증을 마친 요청은 `X-USER-ID` 헤더로 사용자 식별자를 실어 Task API로 전달되고, Task API는 이 값으로 프로젝트 멤버 여부와 작성자 본인 여부를 검증합니다.
 
 ---
 
 ## 🛠️ Tech Stack
-### Develop
-<div>
-  <img src="https://img.shields.io/badge/java-007396?style=for-the-badge&logo=OpenJDK&logoColor=white">
-  <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
-  <img src="https://img.shields.io/badge/Maven-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white">
-  <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=MySQL&logoColor=white">
-  <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white">
-  <img src="https://img.shields.io/badge/Thymeleaf-005F0F?style=for-the-badge&logo=Thymeleaf&logoColor=white">
-</div>
 
-### Testing & Quality
-<div>
-  <img src="https://img.shields.io/badge/JUnit5-25A162?style=for-the-badge&logo=junit5&logoColor=white">
-  <img src="https://img.shields.io/badge/AssertJ-2E8B57?style=for-the-badge">
-  <img src="https://img.shields.io/badge/Mockito-2E8B57?style=for-the-badge">
-  <img src="https://img.shields.io/badge/SonarQube-4E9BCD?style=for-the-badge&logo=sonarqube&logoColor=white">
-</div>
+| 분류 | 프로젝트 전체 | Task API (담당) |
+|--|--|--|
+| **Language** | <img src="https://img.shields.io/badge/Java_21-007396?style=flat-square&logo=openjdk&logoColor=white"> | <img src="https://img.shields.io/badge/Java_21-007396?style=flat-square&logo=openjdk&logoColor=white"> |
+| **Framework** | <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat-square&logo=springboot&logoColor=white"> <img src="https://img.shields.io/badge/Spring_Data_JPA-6DB33F?style=flat-square&logo=spring&logoColor=white"> <img src="https://img.shields.io/badge/Spring_Security-6DB33F?style=flat-square&logo=springsecurity&logoColor=white"> <img src="https://img.shields.io/badge/Thymeleaf-005F0F?style=flat-square&logo=thymeleaf&logoColor=white"> | <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat-square&logo=springboot&logoColor=white"> <img src="https://img.shields.io/badge/Spring_Data_JPA-6DB33F?style=flat-square&logo=spring&logoColor=white"> |
+| **Database / Cache** | <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white"> <img src="https://img.shields.io/badge/H2-09476B?style=flat-square"> <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white"> | <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white"> <img src="https://img.shields.io/badge/H2-09476B?style=flat-square"> |
+| **Test** | <img src="https://img.shields.io/badge/JUnit_5-25A162?style=flat-square&logo=junit5&logoColor=white"> <img src="https://img.shields.io/badge/Mockito-78A641?style=flat-square"> | <img src="https://img.shields.io/badge/JUnit_5-25A162?style=flat-square&logo=junit5&logoColor=white"> <img src="https://img.shields.io/badge/Mockito-78A641?style=flat-square"> |
+| **Build** | <img src="https://img.shields.io/badge/Maven-C71A36?style=flat-square&logo=apachemaven&logoColor=white"> | <img src="https://img.shields.io/badge/Maven-C71A36?style=flat-square&logo=apachemaven&logoColor=white"> |
 
 ---
 
 ## 🔗 Repository
-| Service | Description                           | Repository |
-|--|---------------------------------------|---|
-| Front | 사용자 UI 및 화면 렌더링 (Thymeleaf 기반), 인증 처리 | [![Repo](https://img.shields.io/badge/GitHub_Repository-Front-181717?style=flat-square&logo=github)](https://github.com/AIoT-3/minidooray-team10-front.git)|
-| Gateway | 요청 라우팅                                | [![Repo](https://img.shields.io/badge/GitHub_Repository-Gateway-181717?style=flat-square&logo=github)](https://github.com/AIoT-3/minidooray-team10-gateway.git)|
-| Task | 프로젝트 핵심 비즈니스 로직                       | [![Repo](https://img.shields.io/badge/GitHub_Repository-Account-181717?style=flat-square&logo=github)](https://github.com/AIoT-3/minidooray-team10-account-api.git)|
-| Account | 회원 핵심 비즈니스 로직                         | [![Repo](https://img.shields.io/badge/GitHub_Repository-Task-181717?style=flat-square&logo=github)](https://github.com/AIoT-3/minidooray-team10-task-api.git)|
+| Service | Description | Repository |
+|--|--|--|
+| Front | 사용자 UI 및 화면 렌더링 (Thymeleaf), 인증·세션 | [![Repo](https://img.shields.io/badge/GitHub_Repository-Front-181717?style=flat-square&logo=github)](https://github.com/AIoT-3/minidooray-team10-front) |
+| Gateway | 요청 라우팅 | [![Repo](https://img.shields.io/badge/GitHub_Repository-Gateway-181717?style=flat-square&logo=github)](https://github.com/AIoT-3/minidooray-team10-gateway) |
+| Account API | 회원 비즈니스 로직 | [![Repo](https://img.shields.io/badge/GitHub_Repository-Account-181717?style=flat-square&logo=github)](https://github.com/AIoT-3/minidooray-team10-account-api) |
+| **Task API** | 프로젝트 핵심 비즈니스 로직 **(담당)** | [![Repo](https://img.shields.io/badge/GitHub_Repository-Task-181717?style=flat-square&logo=github)](https://github.com/AIoT-3/minidooray-team10-task-api) |
 
 ---
 
 ## 💻 시스템 구조
-> 본 프로젝트는 기능별 서비스 분리를 적용하여 개발하였습니다.
+> 기능별로 서비스를 분리해 개발했습니다.
 
-
-### ERD (Entity-Relationship-Diagram)
-| account.api | task.api                                              |
-|-------------|-------------------------------------------------------|
-| <img src="img/account_erd.png" width="200" height="200"> | <img src="img/task_erd.png" width="500" height="400"> |
+### ERD
+<table>
+  <tr>
+    <td align="center" valign="top"><b>account-api</b><br/><img src="https://raw.githubusercontent.com/hjiwon203/MiniDooray/main/img/account_erd.png" width="270"></td>
+    <td align="center" valign="top"><b>task-api</b><br/><img src="https://raw.githubusercontent.com/hjiwon203/MiniDooray/main/img/task_erd.png" width="520"></td>
+  </tr>
+</table>
 
 ### 목업
-<img width="500" height="450" alt="account_front" src="https://github.com/user-attachments/assets/ebb7ae02-3981-462d-b3f3-8d44df9cdbb8" />
-<img width="500" height="450" alt="task_front" src="https://github.com/user-attachments/assets/7dc02f06-19d6-4b61-9b77-e84b5460eb70" />
+<img width="400" alt="account_front" src="https://github.com/user-attachments/assets/ebb7ae02-3981-462d-b3f3-8d44df9cdbb8" />
+<img width="400" alt="task_front" src="https://github.com/user-attachments/assets/7dc02f06-19d6-4b61-9b77-e84b5460eb70" />
+
+### Task API 도메인 구조
+
+```
+Project ─┬─ ProjectMember (ADMIN / MEMBER)
+         ├─ Milestone
+         ├─ Tag
+         └─ Task ─┬─ Comment
+                  └─ TaskTag ── Tag   (N:M 해소용 중간 엔티티)
+```
 
 ---
 
 ## 🙆🏻‍♀️ 담당 역할
-### Task API 구현
-...
+
+Task API를 2인이 나눠 맡았고, 저는 **업무(Task) · 댓글(Comment) · 태그(Tag)** 도메인과 **공통 예외 처리**를 구현했습니다.
+(프로젝트 · 멤버 · 마일스톤 · 권한 검증 AOP · 회원 탈퇴 연쇄 정리는 팀원 담당)
+
+| 영역 | 구현 내용 |
+|--|--|
+| 업무(Task) | 업무 목록·상세 조회, 생성, 수정, 삭제 API / 업무-태그 N:M 매핑 / 마일스톤 연결 |
+| 댓글(Comment) | 댓글 등록·수정·삭제 API, 작성자 본인만 수정·삭제하도록 검증 |
+| 태그(Tag) | 프로젝트 단위 태그 관리 서비스, 프로젝트 소속 태그 일괄 조회 쿼리 |
+| 프로젝트 목록 | 사용자별 프로젝트 목록을 **상태별 필터 + 최신순 페이징**으로 조회, 공통 `PageResponse` |
+| 예외 처리 | `ErrorCode` · `BaseException` · `GlobalExceptionHandler`로 에러 응답 형식 통일 |
+| 테스트 | Task·Tag·Milestone 서비스, Task·Comment·Milestone 리포지토리, Project·Tag 컨트롤러 테스트 |
 
 ---
 
 ## 🚀 트러블 슈팅 & 설계 개선
-### 1. 서비스 간 예외 응답 구조 불일치 문제
 
+### 1. 업무 목록 조회 시 N+1 문제
 #### 문제
-- Account API와 Task API가 서로 다른 예외 응답 구조를 사용하여 클라이언트에서 오류 처리를 일관되게 수행하기 어려웠습니다.
-
+- 업무 목록을 조회하면 업무마다 마일스톤과 태그를 가져오는 쿼리가 추가로 나가, 업무 수만큼 쿼리가 늘어났습니다. 상세 조회에서는 태그가 비어서 나오는 문제도 있었습니다.
 #### 원인
-- 서비스별 Exception Response 구조 분리
-- HTTP Status만으로 비즈니스 예외 구분 어려움
-- 프론트에서 예외 처리 로직 증가
-
+- `Task → Milestone`, `Task → TaskTag → Tag` 연관관계가 지연 로딩이라, 응답 DTO로 변환하는 시점에 연관 엔티티마다 쿼리가 실행됨
 #### 해결
-- ErrorCode Enum 정의
-- 공통 ErrorResponse 구조 도입
-- GlobalExceptionHandler 적용
-- 예시
+- 목록·상세 조회를 **fetch join** 쿼리로 바꿔 업무, 마일스톤, 태그를 한 번에 조회
+- 컬렉션 fetch join으로 생기는 중복 행은 `distinct`로 제거
+```java
+select distinct t
+from Task t
+join fetch t.milestone
+left join fetch t.taskTags tt
+left join fetch tt.tag
+where t.project.id = :projectId
+```
+#### 결과
+- 업무 수와 관계없이 조회 쿼리 1회로 목록 응답 구성, 상세 조회의 태그 누락 해결
+
+### 2. 업무 수정 시 태그 변경 처리와 프로젝트 경계 검증
+#### 문제
+- 업무 수정 요청에는 최종 태그 목록이 통째로 오는데, 기존 매핑을 모두 지우고 다시 넣으면 불필요한 삭제·삽입이 생깁니다.
+- 또 태그 ID만 받기 때문에 **다른 프로젝트의 태그 ID**를 넣어도 업무에 연결될 수 있었습니다.
+#### 해결
+- 현재 태그와 요청 태그를 비교해 **빠진 태그만 제거하고 새 태그만 추가**하도록 구현 (`orphanRemoval`로 중간 엔티티 정리)
+- 태그 조회를 `where project.id = :projectId and id in :tagIds` 한 번으로 처리하고, 조회 건수가 요청 건수와 다르면 `INVALID_TAG`로 거절
+- 업무 생성 시 마일스톤도 해당 프로젝트 소속인지 확인
+#### 결과
+- 태그 변경 시 바뀐 매핑만 반영, 프로젝트 간 데이터 섞임 차단
+
+### 3. 예외 응답 형식 통일
+#### 문제
+- 예외마다 응답 형태가 달라 Front에서 오류를 일관되게 처리하기 어려웠습니다.
+#### 해결
+- `ErrorCode` Enum(HTTP 상태 + 서비스 코드 + 메시지)과 공통 `ErrorResponse` 정의
+- `GlobalExceptionHandler`에서 비즈니스 예외, `@Valid`/`@Validated` 검증 실패, 예상하지 못한 예외를 각각 처리
 
   | HTTP Status | Code | Description |
-  |------------|------|-------------|
-  | 404 | P003 | Project Not Found |
-  | 404 | T005 | Task Not Found |
-  | 404 | C001 | Comment Not Found |
-  | 409 | P012 | Project Already Exists |
-  | 403 | N021 | Unauthorized Access |
-  | 500 | S500 | Internal Server Error |
-
+  |--|--|--|
+  | 404 | K005 | 업무를 찾을 수 없음 |
+  | 404 | C001 | 댓글을 찾을 수 없음 |
+  | 400 | T032 | 유효하지 않은 태그 |
+  | 400 | R031 | 입력값 검증 실패 |
+  | 403 | N021 | 접근 권한 없음 |
+  | 500 | S500 | 서버 내부 오류 |
 #### 결과
 - 서비스 간 예외 응답 규격 통일
 - 클라이언트의 오류 처리 로직 단순화
 - 비즈니스 예외 명확한 구분 가능
 
-### 2. Validation 메시지 우선순위 제어
-#### 문제
-- 하나의 입력 필드에 여러 Validation 조건이 적용되어 여러 오류 메시지가 동시에 출력되는 UX 문제가 발생했습니다.
-#### 원인
-- Bean Validation은 모든 제약 조건을 동시에 검증
-- 사용자 입장에서 어떤 오류부터 수정해야 하는지 불명확
-#### 해결
-- @GroupSequence 기반 Validation 순서 정의
-- NotBlank → Pattern → Size 순 검증 흐름 구성
-- Thymeleaf Validation UI와 연동하여 단일 메시지 출력
-
-#### 결과
-- 사용자에게 우선순위 기반 오류 메시지 제공
-- UX 개선 (혼란 감소)
-- 입력 폼 가독성 향상
-
 ---
 
 ## 📷 결과물
-- Account
 
-| login                                              | signup(validation)                                  | MyPage                                              |
-|----------------------------------------------------|-----------------------------------------------------|-----------------------------------------------------|
-| <img src="img/login.png" width="400" height="300"> | <img src="img/signup.png" width="400" height="300"> | <img src="img/mypage.png" width="400" height="300"> |
+### Account
+<table>
+  <tr>
+    <td align="center" valign="top"><b>로그인</b><br/><img src="https://raw.githubusercontent.com/hjiwon203/MiniDooray/main/img/login.png" width="260"></td>
+    <td align="center" valign="top"><b>회원가입 (검증)</b><br/><img src="https://raw.githubusercontent.com/hjiwon203/MiniDooray/main/img/signup.png" width="260"></td>
+    <td align="center" valign="top"><b>마이페이지</b><br/><img src="https://raw.githubusercontent.com/hjiwon203/MiniDooray/main/img/mypage.png" width="260"></td>
+  </tr>
+</table>
 
-- Task
+### Project
+<table>
+  <tr>
+    <td align="center" valign="top"><b>메인 · 프로젝트 목록</b><br/><img src="https://raw.githubusercontent.com/hjiwon203/MiniDooray/main/img/main.png" width="400"></td>
+    <td align="center" valign="top"><b>프로젝트 수정</b><br/><img src="https://raw.githubusercontent.com/hjiwon203/MiniDooray/main/img/project_modify.png" width="400"></td>
+  </tr>
+</table>
 
-| Main (Project List)                                    | Project Create                                           | Project Modify                                              |
-|--------------------------------------------------------|----------------------------------------------------------|-------------------------------------------------------------|
-| <img src="img/main.png" width="400" height="300">      | Main에서 이름으로 생성                                           | <img src="img/project_modify.png" width="350" height="350"> |
-| Task List                                              | Task Create                                              | Task Detail                                                 |
-| <img src="img/task_list.png" width="400" height="300"> | <img src="img/task_create.png" width="400" height="400"> | <img src="img/task_detail.png" width="400" height="400">    |
+> 프로젝트 생성은 메인 화면에서 이름을 입력해 바로 만듭니다.
+
+### Task
+<table>
+  <tr>
+    <td align="center" valign="top"><b>업무 목록</b><br/><img src="https://raw.githubusercontent.com/hjiwon203/MiniDooray/main/img/task_list.png" width="260"></td>
+    <td align="center" valign="top"><b>업무 생성</b><br/><img src="https://raw.githubusercontent.com/hjiwon203/MiniDooray/main/img/task_create.png" width="260"></td>
+    <td align="center" valign="top"><b>업무 상세</b><br/><img src="https://raw.githubusercontent.com/hjiwon203/MiniDooray/main/img/task_detail.png" width="260"></td>
+  </tr>
+</table>
 
 ---
 
 ## 🌱 회고 및 개선 예정 사항
 ### 💬 회고
-- 단기 프로젝트 특성상 기능 구현에 집중하면서 Validation을 단순하게 처리했으나, 사용자 경험 측면에서 입력 검증의 중요성을 체감했습니다.
-- Spring MVC + Thymeleaf 기반 SSR 구조에서 Validation 실패 시 화면 재구성 로직이 Controller에 집중되는 구조적 한계를 경험했습니다.
-- Front / Gateway / API 분리 구조를 통해 계층별 책임 분리의 중요성을 이해했습니다.
-- Redis Session Clustering을 통해 분산 환경에서 인증 상태를 유지하는 구조를 설계하는 경험을 했습니다.
+- 서비스를 나눈 구조에서는 회원 엔티티를 직접 참조할 수 없어, Gateway가 넘겨주는 사용자 ID만으로 권한과 데이터 경계를 지켜야 한다는 점을 배웠습니다.
+- JPA 지연 로딩이 DTO 변환 시점에 쿼리를 만든다는 것을 직접 겪고, 조회 패턴에 맞춰 fetch join을 설계하는 습관이 생겼습니다.
+- 2인이 한 서버를 나눠 개발하면서 예외 코드와 응답 형식을 먼저 맞춰 두는 것이 협업 비용을 크게 줄인다는 것을 느꼈습니다.
 
-### 리팩토링 예정
-- Spring Cloud Netflix Eureka 기반 Service Discovery 적용
-- Front Server 책임 분리 (Service Layer 강화)
-- Validation 일부를 JavaScript 기반 사전 검증으로 이동
-- Controller의 View Model 생성 로직 Service Layer로 이동
-- SonarQube 기반 코드 품질 개선
+### 개선 예정
+- 업무 **수정** 시에도 마일스톤의 프로젝트 소속 검증 추가 (현재는 생성 시에만 확인)
+- 업무 목록에 페이징 적용 (컬렉션 fetch join과 페이징을 함께 쓰기 위해 `@BatchSize` 등 검토)
+- 주석으로 남은 이전 구현 코드 정리
