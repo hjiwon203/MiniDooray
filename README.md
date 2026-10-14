@@ -99,25 +99,8 @@ Gateway Server
 ---
 
 ## 🙆🏻‍♀️ 담당 역할
-### Front + Gateway 서버 개발
-> 사용자 요청 처리와 화면 렌더링을 담당하는 Front 서버를 개발하였습니다.
-
-### 1. 인증 및 세션 관리
-- Spring Security 기반 로그인 구현
-- Redis Session Clustering 적용
-- 여러 서버 환경에서도 동일 세션 유지 구조 설계
-#### 2. API Gateway 연동
-- Front → Gateway → Account/Task API 구조 설계
-- 사용자 인증 정보를 Header 기반으로 전달
-- UserIdHeaderInterceptor를 통해 요청 자동 주입
-#### 3. View 렌더링 및 데이터 조립
-- Thymeleaf 기반 화면 구성
-- API 응답 데이터를 View Model로 변환하여 전달
-- 페이지별 필요한 데이터 조합 로직 구현
-#### 4. Validation 및 예외 처리
-- Bean Validation 적용
-- Validation Group 및 `@GroupSequence` 활용
-- Global Exception Handler를 통한 응답 표준화
+### Task API 구현
+...
 
 ---
 
